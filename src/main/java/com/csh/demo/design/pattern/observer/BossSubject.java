@@ -10,6 +10,7 @@ import java.util.List;
  * time: 下午3:28
  */
 public class BossSubject implements Subject {
+    //定义一个观察者集合用于存储所有观察者对象
     private List<Observer> observers = new ArrayList<>();
     private String action ;
     private String state;
@@ -22,30 +23,6 @@ public class BossSubject implements Subject {
     @Override
     public void detach(Observer observer) {
         observers.remove(observer);
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public List<Observer> getObservers() {
-        return observers;
-    }
-
-    public void setObservers(List<Observer> observers) {
-        this.observers = observers;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
     }
 
     @Override

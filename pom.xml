@@ -108,6 +108,14 @@
     </dependency>
     <!--servlet/jsp api end-->
 
+    <!-- rejava start -->
+    <dependency>
+      <groupId>io.reactivex.rxjava2</groupId>
+      <artifactId>rxjava</artifactId>
+      <version>2.0.7</version>
+    </dependency>
+    <!-- rejava end -->
+
 </dependencies>
   <build>
     <finalName>java-demo</finalName>
