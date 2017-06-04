@@ -4,6 +4,7 @@ package com.csh.demo.rxjava;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -58,23 +59,22 @@ public class RxJavaMethod {
         zip();
     }
 
-    /**
-     * from 方法接受数据,并按顺序返回这些数据
-     * @param names
-     */
-    private static void from(String ... names) {
-        Observable.from(names).subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                System.out.println("from hello " + s );
-            }
-        });
-    }
 
     /**
      * create demo
+     * 1、Observable.create(OnSubscribe) 返回一个 Observable 实例。OnSubscribe 继承 Action1<Subscriber<T>>
+     * 2、observable.subscribe(observer) 或 observable.subscribe(subscriber)。核心逻辑如下:
+     *
+     *  public Subscription subscribe(Subscriber subscriber) {
+     *      subscriber.onStart();
+     *      onSubscribe.call(subscriber);
+     *      return subscriber;
+     *  }
+     *
+     *  Subscriber<T> implements Observer<T>
      */
     private static void create() {
+        // subscribe(Observer)
         Observable.create(new Observable.OnSubscribe<String>(){
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -99,6 +99,7 @@ public class RxJavaMethod {
             }
         });
 
+        // subscribe(Subscriber)
         Observable.create(new Observable.OnSubscribe<String>(){
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -129,6 +130,63 @@ public class RxJavaMethod {
             @Override
             public void onNext(String s) {
                 System.out.println("Subscriber onNext:" + s);
+            }
+        });
+
+        //subscribe 不完整定义回调
+        Observable<String> observable = Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                subscriber.onNext("test01");
+                subscriber.onNext("test02");
+                subscriber.onCompleted();
+            }
+        });
+
+        //Subscriber.onNext(String s)
+        Action1<String> onNextAction = new Action1<String>() {
+            @Override
+            public void call(String s) {
+                System.out.println("不完整 onNext:" + s);
+            }
+        };
+
+        //Subscriber.onError(Throwable e)
+        Action1<Throwable> onErrorAction = new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        };
+        //Subscriber.onCompleted()
+        Action0 onCompletedAction = new Action0() {
+            @Override
+            public void call() {
+                System.out.println("不完整 onCompleted !");
+            }
+        };
+
+        // 自动创建 Subscriber ，并使用 onNextAction 来定义 onNext()
+        observable.subscribe(onNextAction);
+        // 自动创建 Subscriber ，并使用 onNextAction 和 onErrorAction 来定义 onNext() 和 onError()
+        observable.subscribe(onNextAction, onErrorAction);
+        //// 自动创建 Subscriber ，并使用 onNextAction、 onErrorAction 和 onCompletedAction 来定义 onNext()、 onError() 和 onCompleted()
+        observable.subscribe(onNextAction,onErrorAction, onCompletedAction);
+
+
+
+    }
+
+    /**
+     * from 方法接受数据,并按顺序返回这些数据
+     * Observable.from() 内部创建 OnSubscribeFromArray 对象
+     * @param names
+     */
+    private static void from(String ... names) {
+        Observable.from(names).subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                System.out.println("from hello " + s );
             }
         });
     }
@@ -428,6 +486,35 @@ public class RxJavaMethod {
                     @Override
                     public void onNext(Integer integer) {
                         System.out.println("zip onNext :" + integer);
+                    }
+                });
+    }
+
+    /**
+     * lift 形式代理模式
+     */
+    private static void lift(){
+        Observable
+                .just(1,2,3,4,5)
+                .lift(new Observable.Operator<Integer, Integer>() {
+                    @Override
+                    public Subscriber<? super Integer> call(final Subscriber<? super Integer> subscriber) {
+                        return new Subscriber<Integer>() {
+                            @Override
+                            public void onCompleted() {
+                                subscriber.onCompleted();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onNext(Integer integer) {
+                                System.out.println("lift " + integer);
+                            }
+                        };
                     }
                 });
     }
