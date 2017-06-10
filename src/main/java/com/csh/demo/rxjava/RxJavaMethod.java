@@ -4,10 +4,7 @@ package com.csh.demo.rxjava;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
+import rx.functions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +27,9 @@ public class RxJavaMethod {
 
         System.out.println("======= just demo ======");
         just();
+
+        System.out.println("======= defer demo ======");
+        defer();
 
         System.out.println("======= map demo ======");
         map();
@@ -209,6 +209,36 @@ public class RxJavaMethod {
             @Override
             public void onNext(String s) {
                 System.out.println("just onNext : " + s);
+            }
+        });
+    }
+
+    /**
+     * Defer操作符会一直等待直到有观察者订阅它，
+     */
+    private static void defer(){
+        final String s1 = "test1";
+        Observable<String> defer = Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                return Observable.just(s1);
+            }
+        });
+
+        defer.subscribe(new Observer<String>() {
+            @Override
+            public void onCompleted() {
+                System.out.println("defer onCompleted");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onNext(String s) {
+                System.out.println("defer defer");
             }
         });
     }
@@ -518,6 +548,8 @@ public class RxJavaMethod {
                     }
                 });
     }
+
+
 
 }
 
