@@ -17,18 +17,22 @@ public class FileChannelDemo {
         RandomAccessFile aFile =
                 new RandomAccessFile("/Users/csh/workspace/java-demo/src/main/resources/file/nio-data.txt", "rw");
         FileChannel channel = aFile.getChannel();
+        //Buffered 分配内存
         ByteBuffer buffer = ByteBuffer.allocate(48);
-        int read = channel.read(buffer);//写入 buffer
+        //写入 buffer
+        int read = channel.read(buffer);
         while (read != -1) {
             System.out.println("Read " + read);
             //首先读取数据到Buffer，然后flip 反转Buffer,接着再从Buffer中读取数据
             buffer.flip();
             while (buffer.hasRemaining()) {
-                System.out.println(Byte.toString(buffer.get()));
+                //从Buffer中读取数据
+                System.out.print((char)buffer.get());
             }
-
+            //调用 Buffer  的 clear(清空整个缓存区) 或 compact(清除已经读取过的数据)，清空 Buffer
             buffer.clear();
-            int bytesRead = channel.read(buffer);
+            read = channel.read(buffer);
         }
+        aFile.close();
     }
 }

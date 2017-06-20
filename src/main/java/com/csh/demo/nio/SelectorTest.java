@@ -19,7 +19,8 @@ public class SelectorTest {
         ServerSocketChannel ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);//非阻塞
         ssc.socket().bind(new InetSocketAddress(8080));//发送端口
-        ssc.register(selector, SelectionKey.OP_ACCEPT);//注册监听事件
+        SelectionKey register = ssc.register(selector, SelectionKey.OP_ACCEPT);//注册监听事件
+
         while (true) {
             Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> iterator = keys.iterator();
@@ -43,8 +44,6 @@ public class SelectorTest {
                     }
                     iterator.remove();;
                 }
-
-
             }
         }
 
