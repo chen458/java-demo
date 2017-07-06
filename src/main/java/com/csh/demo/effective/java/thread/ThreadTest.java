@@ -11,7 +11,7 @@ public class ThreadTest{
     public static void main(String[] args) {
         new ThreadDemo().start();
         new Thread(new RunableDemo()).start();
-        Executors.newCachedThreadPool().submit(new CallableDemo());
+        Executors.newCachedThreadPool().submit(new CallableDemo1());
         Executors.newCachedThreadPool().execute(new RunableDemo());
 
 
@@ -34,7 +34,7 @@ class RunableDemo implements Runnable {
     }
 }
 
-class CallableDemo implements Callable<String> {
+class CallableDemo1 implements Callable<String> {
 
     @Override
     public String call() throws Exception {
