@@ -17,7 +17,8 @@ public class ThreadDeadlock {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<String> page = executorService.submit(new LoadPageTask(executorService));
         System.out.println("页面内容 : " + page.get());
-
+        int processors = Runtime.getRuntime().availableProcessors();
+        System.out.println("处理器个数 : " + processors);
     }
 
     /**
